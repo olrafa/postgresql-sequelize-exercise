@@ -8,12 +8,17 @@ app.use(bodyParser.urlencoded({ extended: false }))
 app.get('/', (req, res) => res.redirect('/messages'))
 
 app.use(bodyParser.json())
+
 app.post('/messages', (req, res) => {
+  if (req.body.text) {
     console.log(req.body.text)
     res.json(req.body.text)
-   if (!req.body.text) {
-     res.status(400).json(err)
-   }
+  } else {
+    res.status(400).json({
+     message: 'Bad Request'
+    })
+  }
 })
+
 
 app.listen(port, () => console.log(`Listening on port ${port}`))
