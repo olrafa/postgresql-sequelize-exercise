@@ -25,7 +25,7 @@ const Movies = sequelize.define('movies', {
 Movies.sync()
 
 // read all movies (the entire collections resource)
-app.get('/movies', (req, res, next) => {
+app.get('/movies', (req, res) => {
   const limit = req.query.limit || 10
   const offset = req.query.offset || 0
 
@@ -42,7 +42,7 @@ app.get('/movies', (req, res, next) => {
 })
 
 // read a single movie resource
-app.get('/movies/:id', (req, res, next) => {
+app.get('/movies/:id', (req, res) => {
   const id = req.params.id
   Movies.findByPk(id)
   .then(movie => {
@@ -56,16 +56,33 @@ app.get('/movies/:id', (req, res, next) => {
   })
 })
 
-// update a single movie resource
+// update a single movie resource (not working so far)
 app.put('/movies/:id', (req, res) => {
   const id = req.params.id
-  res.json({ message: `Update movie ${id}` })
+  Movies.findByPk(id)
+  .then(movie => movie.update({
+    title: title,
+    yearOfRelease: yearOfRelease,
+    synopsis: synopsis
+  }))
+  .then(movie => {
+    res.json({ message: `Movie updated: ${movie}` })
+})
+  .catch(err => {
+    res.status(500).json({
+      message: 'Something went wrong',
+      error: err
+    })
+  })
 })
 
 // delete a single movie resource
-app.delete('/movies/:id', (req, res) => {
+app.delete('/movies/:id', (req, res, next) => {
   const id = req.params.id
-  res.json({ message: `Delete movie ${id}` })
+  Movies.findByPk(id)
+  .then(movie => movie.destroy())
+  .then(res.json({ message: `Movie deleted` }))
+  .catch(error => next(error))
 })
 
 // create a new movie resource
