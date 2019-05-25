@@ -50,28 +50,22 @@ app.get('/movies/:id', (req, res) => {
   })
   .catch(err => {
     res.status(500).json({
-      message: 'Something went wrong',
-      error: err
+      message: 'Something went wrong'
     })
   })
 })
 
-// update a single movie resource (not working so far)
-app.put('/movies/:id', (req, res) => {
+// update a single movie resource
+app.put('/movies/:id', (req, res, next) => {
   const id = req.params.id
   Movies.findByPk(id)
-  .then(movie => movie.update({
-    title: title,
-    yearOfRelease: yearOfRelease,
-    synopsis: synopsis
-  }))
+  .then(movie => movie.update(req.body))
   .then(movie => {
-    res.json({ message: `Movie updated: ${movie}` })
+    res.json({ message: `Movie updated: ${movie.title}` })
 })
   .catch(err => {
     res.status(500).json({
-      message: 'Something went wrong',
-      error: err
+      message: 'Something went wrong'
     })
   })
 })
