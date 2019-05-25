@@ -11,9 +11,9 @@ app.use(bodyParser.json())
 app.post('/messages', (req, res) => {
     console.log(req.body.text)
     res.json(req.body.text)
-//    if (!req.body.text) {
-//      res.status(400).json(err)
-//    }
+   if (!req.body.text) {
+     res.status(400).json(err)
+   }
 })
 
 app.listen(port, () => console.log(`Listening on port ${port}`))

@@ -8,7 +8,7 @@ const name = "James"
 
 client.connect()
     .then(() => {
-        console.log("Connection to Postgres established!")
+        console.log("Connection to Postgres established")
     })
     .then(() => client.query('DROP TABLE person')) // remove this before final push
     .then(() => client.query('CREATE TABLE IF NOT EXISTS person (id serial, first_name varchar(255), last_name varchar(255), eye_color varchar(255))'))
@@ -19,11 +19,11 @@ client.connect()
    
    .then(() => client.query('SELECT * FROM person WHERE first_name = ($1)', [name]))
 
-    .then(res => {
-        console.log(res.rows)
-        return client.end()
+   .then(res => {
+      console.log(res.rows)
+      return client.end()
     })
     .then(() => {
-        console.log("Connection closed!")
+        console.log("Connection closed")
     })
     .catch(err => console.error(err))

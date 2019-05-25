@@ -1,15 +1,14 @@
 const express = require('express')
 const app = express()
+const port = 4000
 const bodyParser = require('body-parser')
 const Sequelize = require('sequelize')
-const connectionString = process.env.DATABASE_URL || 'postgres://postgres:secret@localhost:5432/postgres'
-const sequelize = new Sequelize(connectionString, {define: { timestamps: false }})
+const sequelize = new Sequelize('postgres://postgres:secret@localhost:5432/postgres', {define: { timestamps: false }})
 
 app.use(bodyParser.json())
 
 // model
-const Movies = sequelize.define(
-  'movies', {
+const Movies = sequelize.define('movies', {
   title: {
     type: Sequelize.STRING,
     allowNull: false
@@ -23,38 +22,55 @@ const Movies = sequelize.define(
   }
 })
 
+Movies.sync()
+
 // read all movies (the entire collections resource)
-app.get('/movies', function (req, res, next) {
-  const limit = req.query.limit || 20
+app.get('/movies', (req, res, next) => {
+  const limit = req.query.limit || 10
   const offset = req.query.offset || 0
 
   Movies.findAll({ limit, offset })
-  .then(res.json('Complete list of movies'))
-  .catch(error => next(error))
+  .then(movies => {
+    res.json({ movies: movies })
+  })
+  .catch(err => {
+    res.status(500).json({
+      message: 'Something went wrong',
+      error: err
+    })
+  })
 })
 
 // read a single movie resource
-app.get('/movies/:id', function (req, res, next) {
+app.get('/movies/:id', (req, res, next) => {
   const id = req.params.id
-  res.json(`Movie ${id}`)
-
+  Movies.findByPk(id)
+  .then(movie => {
+    res.json({ movie: movie })
+  })
+  .catch(err => {
+    res.status(500).json({
+      message: 'Something went wrong',
+      error: err
+    })
+  })
 })
 
 // update a single movie resource
-app.put('/movies/:id', function (req, res) {
+app.put('/movies/:id', (req, res) => {
   const id = req.params.id
   res.json({ message: `Update movie ${id}` })
 })
 
 // delete a single movie resource
-app.delete('/movies/:id', function (req, res) {
+app.delete('/movies/:id', (req, res) => {
   const id = req.params.id
   res.json({ message: `Delete movie ${id}` })
 })
 
 // create a new movie resource
 app.post('/movies', (req, res, next) => {
-  const movie = {
+    const movie = {
     title: req.body.title,
     yearOfRelease: req.body.yearOfRelease,
     synopsis: req.body.synopsis
@@ -66,6 +82,6 @@ app.post('/movies', (req, res, next) => {
 })
 
 
-app.listen(5432, () => {
-  console.log('Web server listening on port 5432')
+app.listen(port, () => {
+  console.log(`Listening on port ${port}`)
 })
