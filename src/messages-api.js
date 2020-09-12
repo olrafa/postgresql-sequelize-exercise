@@ -14,9 +14,7 @@ app.post('/messages', (req, res) => {
     console.log(req.body.text)
     res.json(req.body.text)
   } else {
-    res.status(400).json({
-     message: 'Bad Request'
-    })
+    return res.status(400).end()
   }
 })
 
